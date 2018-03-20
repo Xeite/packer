@@ -62,6 +62,11 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 		return nil, fmt.Errorf("Error initializing compute client: %s", err)
 	}
 
+	// By default, instance name is same as image name
+	if b.config.InstanceName == "" {
+		b.config.InstanceName = b.config.ImageName
+	}
+
 	// Setup the state bag and initial state for the steps
 	state := new(multistep.BasicStateBag)
 	state.Put("config", b.config)
@@ -82,7 +87,7 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 			SSHAgentAuth:         b.config.RunConfig.Comm.SSHAgentAuth,
 		},
 		&StepRunSourceServer{
-			Name:             b.config.ImageName,
+			Name:             b.config.InstanceName,
 			SourceImage:      b.config.SourceImage,
 			SourceImageName:  b.config.SourceImageName,
 			SecurityGroups:   b.config.SecurityGroups,
